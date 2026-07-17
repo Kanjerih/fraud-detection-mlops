@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: fraud-detection-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: CLASSIFICATION_THRESHOLD
+        value: "0.3"
+    autoDeploy: true

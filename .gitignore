@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+coverage.xml
+.coverage
+
+# Env
+.venv/
+venv/
+.env
+
+# Data (DVC-tracked, not committed to Git)
+/data/raw/*.csv
+/data/processed/*
+
+# Models & experiment tracking artifacts
+/models/*.joblib
+mlruns/
+mlartifacts/
+
+# Reports (generated, not committed)
+/reports/*.html
+/reports/*.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

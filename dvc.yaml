@@ -1,0 +1,31 @@
+stages:
+  fetch_data:
+    cmd: python -m src.data.fetch_data
+    deps:
+      - src/data/fetch_data.py
+    outs:
+      - data/raw/creditcard.csv
+
+  train:
+    cmd: python -m src.models.train
+    deps:
+      - data/raw/creditcard.csv
+      - src/data/load_data.py
+      - src/models/train.py
+      - src/config.py
+    outs:
+      - models/model.joblib:
+          cache: false  # tracked via MLflow artifacts instead of DVC cache
+    metrics:
+      - reports/threshold_savings_report.json:
+          cache: false
+
+  evaluate:
+    cmd: python -m src.models.evaluate
+    deps:
+      - data/raw/creditcard.csv
+      - src/models/evaluate.py
+      - models/model.joblib
+    outs:
+      - reports/threshold_savings_report.json:
+          cache: false

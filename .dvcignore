@@ -1,0 +1,5 @@
+# Files DVC should not scan for pipeline dependencies
+.git/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
