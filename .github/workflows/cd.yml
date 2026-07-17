@@ -44,21 +44,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase image name
+        id: image
+        run: echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ steps.image.outputs.name }}:latest
+            ghcr.io/${{ steps.image.outputs.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Trigger Render deploy
         run: |
-          curl -X POST "https://api.render.com/deploy/${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_DEPLOY_KEY }}"
-        # Render's deploy hook URL (Settings > Deploy Hook on the service)
-        # is stored as two repo secrets: RENDER_SERVICE_ID and RENDER_DEPLOY_KEY.
-        # Render also supports autoDeploy from GitHub directly (see render.yaml),
-        # so this step is optional if autoDeploy: true is sufficient for your workflow.
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        # In Render: open your Web Service → Settings → find "Deploy Hook"
+        # (a unique URL). Copy it and store as a single repo secret named
+        # RENDER_DEPLOY_HOOK_URL. Hitting that URL tells Render to pull the
+        # image tag configured on the service and redeploy.
