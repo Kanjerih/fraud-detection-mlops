@@ -868,12 +868,6 @@
     }
   }
 
-  // Init
-  currentTransaction = generateTransaction(currentProfile);
-  renderTicket(currentTransaction);
-  checkHealth();
-  showPage(location.hash ? location.hash.replace("#", "") : "terminal");
-
   // --- Page navigation (Terminal / Dashboard) ---
   const navTabs = document.querySelectorAll(".nav-tab");
   const pages = document.querySelectorAll(".page");
@@ -892,6 +886,12 @@
     const name = location.hash.replace("#", "") || "terminal";
     showPage(name);
   });
+
+  // Init
+  currentTransaction = generateTransaction(currentProfile);
+  renderTicket(currentTransaction);
+  checkHealth();
+  showPage(location.hash ? location.hash.replace("#", "") : "terminal");
 
   // --- Savings-by-threshold chart (from validated cross-validation run) ---
   const savingsData = [
