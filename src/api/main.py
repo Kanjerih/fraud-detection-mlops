@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.schemas import HealthResponse, PredictionResponse, TransactionRequest
 from src.config import settings
@@ -47,6 +48,16 @@ app = FastAPI(
     "and threshold-tuned against a cost-of-error analysis.",
     version="1.0.0",
     lifespan=lifespan,
+)
+# CORS: allows the separately-hosted frontend (a different origin) to call
+# this API from a browser. Wide open (*) is fine for a portfolio demo with
+# no auth/sensitive data; for a real production system, replace with an
+# explicit list of allowed frontend domains.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
 )
 
 
