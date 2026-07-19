@@ -458,6 +458,57 @@
     margin-bottom: 32px;
   }
 
+  /* ---------- Model card ---------- */
+  .kv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 32px;
+  }
+  @media (max-width: 640px) { .kv-grid { grid-template-columns: 1fr; } }
+  .kv-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--line);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .kv-row .k { color: var(--muted); }
+  .kv-row .v { color: var(--text); text-align: right; }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .tag.in-scope { border-color: rgba(79, 209, 174, 0.4); color: var(--safe); }
+  .tag.out-scope { border-color: rgba(255, 107, 91, 0.4); color: var(--risk); }
+
+  .limitation-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .limitation-item:last-child { border-bottom: none; }
+  .limitation-mark {
+    font-family: var(--font-mono);
+    color: var(--risk);
+    flex-shrink: 0;
+  }
+  .limitation-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .limitation-text strong { color: var(--text); font-weight: 500; }
+
   /* ---------- Stat strip ---------- */
   .stats {
     display: grid;
@@ -551,6 +602,7 @@
   <nav class="nav-tabs">
     <button class="nav-tab active" data-page="terminal">Terminal</button>
     <button class="nav-tab" data-page="dashboard">Dashboard</button>
+    <button class="nav-tab" data-page="modelcard">Model Card</button>
   </nav>
 
   <section class="page active" id="page-terminal">
@@ -687,6 +739,88 @@
       <li>Net savings was still increasing at threshold 0.3; the sweep hasn't yet confirmed whether savings peak below that point.</li>
       <li>Drift monitoring exists in the pipeline but isn't yet scheduled against live inference traffic.</li>
     </ul>
+  </div>
+
+  </section>
+
+  <section class="page" id="page-modelcard">
+
+  <div class="hero-eyebrow">Model Card</div>
+  <h1 style="font-size: clamp(24px, 3.4vw, 32px);">What this model is, what it isn't, and where it can go wrong.</h1>
+  <p class="hero-sub" style="margin-bottom: 32px;">
+    A structured summary following standard model-card practice
+    (Google / Hugging Face conventions) — the goal is that someone
+    could decide whether to trust this model without reading the code.
+  </p>
+
+  <div class="dash-section">
+    <h3 class="dash-section-title">Model details</h3>
+    <p class="dash-section-sub">What it is, mechanically</p>
+    <div class="kv-grid">
+      <div>
+        <div class="kv-row"><span class="k">Architecture</span><span class="v">Random Forest Classifier</span></div>
+        <div class="kv-row"><span class="k">Library</span><span class="v">scikit-learn 1.5.1</span></div>
+        <div class="kv-row"><span class="k">Estimators</span><span class="v">100 trees</span></div>
+        <div class="kv-row"><span class="k">Registered as</span><span class="v">fraud-detection-rf · v1</span></div>
+      </div>
+      <div>
+        <div class="kv-row"><span class="k">Tracking</span><span class="v">MLflow</span></div>
+        <div class="kv-row"><span class="k">Decision threshold</span><span class="v">0.3 (cost-tuned)</span></div>
+        <div class="kv-row"><span class="k">Validation</span><span class="v">5-fold stratified CV</span></div>
+        <div class="kv-row"><span class="k">Quality gate</span><span class="v">recall ≥0.70, precision ≥0.85, MCC ≥0.75</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <h3 class="dash-section-title">Intended use</h3>
+    <p class="dash-section-sub">What it's for, and explicitly not for</p>
+    <div class="tag-row">
+      <span class="tag in-scope">✓ Portfolio / educational demo</span>
+      <span class="tag in-scope">✓ Illustrating an MLOps pipeline</span>
+      <span class="tag in-scope">✓ Flagging transactions for human review</span>
+    </div>
+    <div class="tag-row">
+      <span class="tag out-scope">✗ Real payment processing</span>
+      <span class="tag out-scope">✗ Automatic transaction blocking</span>
+      <span class="tag out-scope">✗ Any production financial decisioning</span>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <h3 class="dash-section-title">Training data</h3>
+    <p class="dash-section-sub">What it learned from</p>
+    <div class="kv-row"><span class="k">Source</span><span class="v">Kaggle — credit-card-fraud-dataset</span></div>
+    <div class="kv-row"><span class="k">Transactions</span><span class="v">284,807</span></div>
+    <div class="kv-row"><span class="k">Confirmed fraud</span><span class="v">492 (0.173%)</span></div>
+    <div class="kv-row"><span class="k">Features</span><span class="v">Time, Amount, V1–V28 (PCA-transformed, anonymized)</span></div>
+    <div class="kv-row" style="border-bottom: none;"><span class="k">Time span</span><span class="v">2 days of transactions, single dataset snapshot</span></div>
+  </div>
+
+  <div class="dash-section">
+    <h3 class="dash-section-title">Known limitations</h3>
+    <p class="dash-section-sub">Where this model can mislead you</p>
+
+    <div class="limitation-item">
+      <span class="limitation-mark">!</span>
+      <span class="limitation-text"><strong>Severe class imbalance.</strong> Fraud is 0.17% of the data — accuracy is meaningless here; every metric on the Dashboard was chosen specifically to avoid that trap.</span>
+    </div>
+    <div class="limitation-item">
+      <span class="limitation-mark">!</span>
+      <span class="limitation-text"><strong>Anonymized features.</strong> V1–V28 are PCA components with no real-world meaning available — the model can't be interrogated for *why* it flagged a transaction beyond feature importances.</span>
+    </div>
+    <div class="limitation-item">
+      <span class="limitation-mark">!</span>
+      <span class="limitation-text"><strong>Static training snapshot.</strong> Trained on 2 days of transactions from one point in time — real fraud patterns shift, and this model has no mechanism to detect that drift on its own yet.</span>
+    </div>
+    <div class="limitation-item">
+      <span class="limitation-mark">!</span>
+      <span class="limitation-text"><strong>Cost assumption is a placeholder.</strong> The $10-per-false-positive figure driving the recommended threshold was not sourced from a real business — it should be replaced before this logic informs any real decision.</span>
+    </div>
+    <div class="limitation-item">
+      <span class="limitation-mark">!</span>
+      <span class="limitation-text"><strong>1-in-5 fraud cases missed.</strong> At 78.5% recall, roughly 22% of actual fraud in any given batch would pass through undetected.</span>
+    </div>
   </div>
 
   </section>
