@@ -31,9 +31,6 @@ def run_drift_check(reference_df, current_df, output_path):
 def main():
     df = load_raw_data()
 
-    # Example split: first half as "reference" (training-time distribution),
-    # second half as "current" (stand-in for freshly arriving data).
-    # In production, swap `current` for a logged table of recent live inputs.
     midpoint = len(df) // 2
     reference_df = df.iloc[:midpoint].drop(columns=["Class"])
     current_df = df.iloc[midpoint:].drop(columns=["Class"])
