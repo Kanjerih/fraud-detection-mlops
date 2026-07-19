@@ -9,9 +9,7 @@ import pandas as pd
 
 from src.config import settings
 
-EXPECTED_COLUMNS = (
-    ["Time"] + [f"V{i}" for i in range(1, 29)] + ["Amount", "Class"]
-)
+EXPECTED_COLUMNS = ["Time"] + [f"V{i}" for i in range(1, 29)] + ["Amount", "Class"]
 
 
 def load_raw_data(path=None) -> pd.DataFrame:
@@ -19,8 +17,7 @@ def load_raw_data(path=None) -> pd.DataFrame:
     path = path or settings.raw_data_path
     if not path.exists():
         raise FileNotFoundError(
-            f"Raw data not found at {path}. "
-            "Run `dvc pull` or place creditcard.csv in data/raw/."
+            f"Raw data not found at {path}. " "Run `dvc pull` or place creditcard.csv in data/raw/."
         )
 
     df = pd.read_csv(path)

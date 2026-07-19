@@ -53,9 +53,9 @@ def cross_validate(X, y, n_splits, random_state) -> dict:
         scores["f1"].append(f1_score(y_val, preds, zero_division=0))
         scores["mcc"].append(matthews_corrcoef(y_val, preds))
 
-    return {
-        f"cv_{metric}_mean": float(np.mean(vals)) for metric, vals in scores.items()
-    } | {f"cv_{metric}_std": float(np.std(vals)) for metric, vals in scores.items()}
+    return {f"cv_{metric}_mean": float(np.mean(vals)) for metric, vals in scores.items()} | {
+        f"cv_{metric}_std": float(np.std(vals)) for metric, vals in scores.items()
+    }
 
 
 def train() -> dict:
@@ -100,9 +100,7 @@ def train() -> dict:
         }
         mlflow.log_metrics(holdout_metrics)
 
-        cv_metrics = cross_validate(
-            X, y, settings.n_cv_folds, settings.random_state
-        )
+        cv_metrics = cross_validate(X, y, settings.n_cv_folds, settings.random_state)
         mlflow.log_metrics(cv_metrics)
 
         settings.model_dir.mkdir(parents=True, exist_ok=True)
@@ -131,11 +129,11 @@ def train() -> dict:
         mlflow.set_tag("gate_passed", str(gate_passed))
 
         if gate_passed:
-            mlflow.register_model(
-                f"runs:/{run.info.run_id}/model", settings.registered_model_name
+            mlflow.register_model(f"runs:/{run.info.run_id}/model", settings.registered_model_name)
+            print(
+                f"\n✅ Model passed quality gate and was registered "
+                f"as '{settings.registered_model_name}'."
             )
-            print(f"\n✅ Model passed quality gate and was registered "
-                  f"as '{settings.registered_model_name}'.")
         else:
             print(
                 "\n❌ Model FAILED quality gate "

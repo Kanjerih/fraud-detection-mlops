@@ -35,10 +35,14 @@ def test_cross_validate_returns_expected_keys(synthetic_data):
     results = cross_validate(X, y, n_splits=3, random_state=0)
 
     expected_keys = {
-        "cv_precision_mean", "cv_precision_std",
-        "cv_recall_mean", "cv_recall_std",
-        "cv_f1_mean", "cv_f1_std",
-        "cv_mcc_mean", "cv_mcc_std",
+        "cv_precision_mean",
+        "cv_precision_std",
+        "cv_recall_mean",
+        "cv_recall_std",
+        "cv_f1_mean",
+        "cv_f1_std",
+        "cv_mcc_mean",
+        "cv_mcc_std",
     }
     assert expected_keys.issubset(results.keys())
 

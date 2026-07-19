@@ -74,9 +74,7 @@ def health():
 def predict(transaction: TransactionRequest):
     model = model_state["model"]
     if model is None:
-        raise HTTPException(
-            status_code=503, detail="Model not loaded. Train a model first."
-        )
+        raise HTTPException(status_code=503, detail="Model not loaded. Train a model first.")
 
     row = pd.DataFrame([transaction.model_dump()])
     prob = float(model.predict_proba(row)[:, 1][0])
