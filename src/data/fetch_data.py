@@ -11,7 +11,6 @@ Run with:  python -m src.data.fetch_data
 import shutil
 import subprocess
 import zipfile
-from pathlib import Path
 
 from src.config import settings
 
