@@ -11,7 +11,6 @@ Run with:  python -m src.models.evaluate
 
 import json
 
-import joblib
 import numpy as np
 from sklearn.metrics import precision_score, recall_score
 from sklearn.model_selection import StratifiedKFold
@@ -46,14 +45,10 @@ def sweep_thresholds(X, y, thresholds, n_splits, random_state, fp_cost):
             fp_mask = (y_val_arr == 0) & (preds == 1)
 
             net_savings = (
-                amounts_val[tp_mask].sum()
-                - amounts_val[fn_mask].sum()
-                - fp_mask.sum() * fp_cost
+                amounts_val[tp_mask].sum() - amounts_val[fn_mask].sum() - fp_mask.sum() * fp_cost
             )
             results[t]["savings"].append(net_savings)
-            results[t]["precision"].append(
-                precision_score(y_val_arr, preds, zero_division=0)
-            )
+            results[t]["precision"].append(precision_score(y_val_arr, preds, zero_division=0))
             results[t]["recall"].append(recall_score(y_val_arr, preds, zero_division=0))
 
     summary = {}
@@ -86,13 +81,13 @@ def main():
     settings.reports_dir.mkdir(parents=True, exist_ok=True)
     report_path = settings.reports_dir / "threshold_savings_report.json"
     with open(report_path, "w") as f:
-        json.dump(
-            {"results": summary, "recommended_threshold": best_threshold}, f, indent=2
-        )
+        json.dump({"results": summary, "recommended_threshold": best_threshold}, f, indent=2)
 
     print(f"Report written to {report_path}")
-    print(f"Recommended threshold: {best_threshold} "
-          f"(net savings ${summary[best_threshold]['net_savings_mean']:,.2f})")
+    print(
+        f"Recommended threshold: {best_threshold} "
+        f"(net savings ${summary[best_threshold]['net_savings_mean']:,.2f})"
+    )
 
 
 if __name__ == "__main__":

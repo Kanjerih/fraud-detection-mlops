@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRAUD//WATCH — Transaction Risk Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0C1220;
+    --panel: #131B2E;
+    --panel-raised: #182238;
+    --line: #26314A;
+    --safe: #4FD1AE;
+    --risk: #FF6B5B;
+    --text: #E8ECF4;
+    --muted: #8791A8;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(79, 209, 174, 0.06), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(255, 107, 91, 0.05), transparent 40%);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--safe); }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+  }
+  .logo span { color: var(--muted); font-weight: 500; }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    background: var(--panel);
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: background 0.3s;
+  }
+  .dot.online { background: var(--safe); box-shadow: 0 0 8px var(--safe); }
+  .dot.offline { background: var(--risk); box-shadow: 0 0 8px var(--risk); }
+
+  /* ---------- Hero copy ---------- */
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--safe);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    margin: 0 0 14px;
+    max-width: 640px;
+  }
+  .hero-sub {
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 0 40px;
+    font-size: 15px;
+  }
+  .hero-sub code {
+    font-family: var(--font-mono);
+    background: var(--panel);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  /* ---------- Terminal grid ---------- */
+  .terminal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  @media (max-width: 720px) {
+    .terminal { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--panel);
+    padding: 28px;
+  }
+
+  .panel-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ---------- Ticket ---------- */
+  .ticket-id {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--safe);
+  }
+
+  .field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--line);
+    font-family: var(--font-mono);
+  }
+  .field-row:first-of-type { border-top: 1px dashed var(--line); margin-top: 4px; }
+  .field-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field-value { font-size: 16px; font-weight: 500; }
+
+  .profile-toggle {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .profile-btn {
+    flex: 1;
+    padding: 10px;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .profile-btn.active {
+    border-color: var(--safe);
+    color: var(--safe);
+    background: rgba(79, 209, 174, 0.08);
+  }
+  .profile-btn:hover { border-color: var(--text); color: var(--text); }
+  .profile-btn.active:hover { border-color: var(--safe); color: var(--safe); }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  button.primary, button.secondary {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  button.primary {
+    background: var(--safe);
+    color: #06231C;
+    font-weight: 600;
+    flex: 1;
+  }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+  button:hover { opacity: 0.9; }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ---------- Verdict panel ---------- */
+  .gauge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0 4px;
+  }
+  .gauge-value {
+    font-family: var(--font-mono);
+    font-size: 40px;
+    font-weight: 600;
+    margin-top: -46px;
+    transition: color 0.3s;
+  }
+  .gauge-caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .verdict-box {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--panel-raised);
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  .verdict-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .verdict-text {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .verdict-text.safe { color: var(--safe); }
+  .verdict-text.risk { color: var(--risk); }
+  .verdict-text.idle { color: var(--muted); }
+
+  .meta-note {
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+
+  /* ---------- Nav tabs ---------- */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 40px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 4px;
+    width: fit-content;
+  }
+  .nav-tab {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 9px 18px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active {
+    background: var(--panel-raised);
+    color: var(--safe);
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ---------- Dashboard ---------- */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 720px) { .metric-grid { grid-template-columns: repeat(2, 1fr); } }
+  .metric-card {
+    background: var(--panel);
+    padding: 22px 20px;
+  }
+  .metric-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .metric-value {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--safe);
+    line-height: 1;
+  }
+  .metric-std {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .dash-section {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .dash-section-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .dash-section-sub {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 24px;
+  }
+
+  .chart-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    height: 180px;
+    padding: 0 4px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .chart-bar {
+    width: 100%;
+    max-width: 46px;
+    border-radius: 4px 4px 0 0;
+    background: var(--line);
+    position: relative;
+    transition: height 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .chart-bar.best { background: var(--safe); }
+  .chart-bar-value {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text);
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .chart-labels {
+    display: flex;
+    gap: 14px;
+    padding: 0 4px;
+  }
+  .chart-label {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    max-width: 46px;
+    margin: 0 auto;
+  }
+  .chart-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .chart-legend span { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  .recommend-callout {
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    background: rgba(79, 209, 174, 0.08);
+    border: 1px solid rgba(79, 209, 174, 0.3);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--safe);
+  }
+
+  .caveat-list {
+    font-size: 13px;
+    color: var(--muted);
+    padding-left: 18px;
+    margin: 0;
+  }
+  .caveat-list li { margin-bottom: 8px; }
+
+  .data-freshness {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: -12px;
+    margin-bottom: 32px;
+  }
+
+  /* ---------- Stat strip ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 48px;
+  }
+  @media (max-width: 720px) { .stats { grid-template-columns: 1fr; } }
+  .stat {
+    background: var(--panel);
+    padding: 22px 24px;
+  }
+  .stat-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--safe);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .stat-body { font-size: 14px; color: var(--muted); }
+  .stat-body strong { color: var(--text); font-weight: 500; }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .settings-toggle {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+  .settings-panel {
+    margin-top: 12px;
+    display: none;
+    gap: 8px;
+  }
+  .settings-panel.open { display: flex; }
+  .settings-panel input {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+  }
+  .settings-panel button {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 0 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">FRAUD<span>//</span>WATCH</div>
+    <div class="status-pill"><span class="dot" id="statusDot"></span><span id="statusText">checking model…</span></div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" data-page="terminal">Terminal</button>
+    <button class="nav-tab" data-page="dashboard">Dashboard</button>
+  </nav>
+
+  <section class="page active" id="page-terminal">
+
+  <div class="hero-eyebrow">Transaction Risk Terminal</div>
+  <h1>Run a transaction through the fraud model. Watch the needle decide.</h1>
+  <p class="hero-sub">
+    A live demo of a Random Forest classifier trained on 285K real credit-card
+    transactions, deployed via <code>MLflow → Docker → GHCR → Render</code>.
+    Generate a simulated transaction below and send it to the model.
+  </p>
+
+  <div class="terminal">
+    <div class="panel">
+      <div class="panel-label"><span>Transaction Ticket</span><span class="ticket-id" id="ticketId">#——————</span></div>
+
+      <div class="field-row"><span class="field-label">Amount</span><span class="field-value" id="valAmount">$—.——</span></div>
+      <div class="field-row"><span class="field-label">Time offset</span><span class="field-value" id="valTime">——:——:——</span></div>
+      <div class="field-row"><span class="field-label">Feature profile</span><span class="field-value" id="valProfile">V1–V28 (PCA)</span></div>
+
+      <div class="profile-toggle">
+        <button class="profile-btn active" id="btnNormal" data-profile="normal">Typical pattern</button>
+        <button class="profile-btn" id="btnSuspicious" data-profile="suspicious">Anomalous pattern</button>
+      </div>
+
+      <div class="actions">
+        <button class="secondary" id="btnGenerate">Generate ticket</button>
+        <button class="primary" id="btnRun" disabled>Run through model</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label"><span>Risk Assessment</span><span id="latency">—</span></div>
+
+      <div class="gauge-wrap">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <defs>
+            <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#4FD1AE"/>
+              <stop offset="50%" stop-color="#E8C547"/>
+              <stop offset="100%" stop-color="#FF6B5B"/>
+            </linearGradient>
+          </defs>
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#26314A" stroke-width="14" stroke-linecap="round"/>
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#arcGradient)" stroke-width="14" stroke-linecap="round" opacity="0.35"/>
+          <line id="needle" x1="110" y1="110" x2="110" y2="35" stroke="#E8ECF4" stroke-width="3" stroke-linecap="round" style="transform-origin: 110px 110px; transform: rotate(-90deg); transition: transform 1s cubic-bezier(0.34, 1.4, 0.64, 1);"/>
+          <circle cx="110" cy="110" r="6" fill="#E8ECF4"/>
+        </svg>
+        <div class="gauge-value" id="gaugeValue" style="color: var(--muted);">—</div>
+        <div class="gauge-caption">Probability of fraud</div>
+      </div>
+
+      <div class="verdict-box">
+        <div class="verdict-label">Verdict</div>
+        <div class="verdict-text idle" id="verdictText">Awaiting transaction</div>
+      </div>
+      <div class="meta-note" id="metaNote">Model v— · threshold —</div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-eyebrow">Data</div>
+      <div class="stat-body"><strong>284,807</strong> transactions, <strong>492</strong> confirmed fraud (0.17%)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-eyebrow">Model</div>
+      <div class="stat-body">Random Forest · 5-fold stratified CV · <strong>94.9%</strong> precision</div>
+    </div>
+    <div class="stat">
+      <div class="stat-eyebrow">Pipeline</div>
+      <div class="stat-body">MLflow-gated training → Docker → GHCR → <strong>Render</strong></div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="page" id="page-dashboard">
+
+  <div class="hero-eyebrow">Model Validation Report</div>
+  <h1 style="font-size: clamp(24px, 3.4vw, 32px);">How the model performs, and what it's worth in dollars.</h1>
+  <p class="hero-sub" style="margin-bottom: 8px;">
+    Metrics from 5-fold stratified cross-validation and a threshold-tuned
+    cost/savings analysis — not a single lucky train/test split.
+  </p>
+  <div class="data-freshness">Latest validated training run · <span id="modelVersionNote">checking model…</span></div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">Precision</div>
+      <div class="metric-value">94.9%</div>
+      <div class="metric-std">± 2.31%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Recall</div>
+      <div class="metric-value">78.5%</div>
+      <div class="metric-std">± 1.71%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">F1-score</div>
+      <div class="metric-value">85.9%</div>
+      <div class="metric-std">± 1.77%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">MCC</div>
+      <div class="metric-value">0.863</div>
+      <div class="metric-std">± 0.018</div>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <h3 class="dash-section-title">Net savings by decision threshold</h3>
+    <p class="dash-section-sub">Cross-validated · assumes $10 cost per false-positive manual review</p>
+
+    <div class="chart-row" id="chartRow"></div>
+    <div class="chart-labels" id="chartLabels"></div>
+
+    <div class="chart-legend">
+      <span><span class="legend-dot" style="background: var(--safe);"></span> Best net savings</span>
+      <span><span class="legend-dot" style="background: var(--line);"></span> Other thresholds tested</span>
+    </div>
+
+    <div class="recommend-callout">
+      → Threshold <strong>0.3</strong> maximizes net savings at <strong>$5,972</strong> per test fold —
+      19% higher than the default 0.5 threshold ($5,026), by trading some precision for materially higher recall.
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <h3 class="dash-section-title">What this doesn't tell you yet</h3>
+    <p class="dash-section-sub">Open limitations, tracked honestly</p>
+    <ul class="caveat-list">
+      <li>The $10 false-positive cost is a placeholder assumption, not a confirmed business figure — the recommended threshold would shift under a different cost structure.</li>
+      <li>Net savings was still increasing at threshold 0.3; the sweep hasn't yet confirmed whether savings peak below that point.</li>
+      <li>Drift monitoring exists in the pipeline but isn't yet scheduled against live inference traffic.</li>
+    </ul>
+  </div>
+
+  </section>
+
+  <footer>
+    <span>Portfolio project · not connected to real payment data</span>
+    <div>
+      <button class="settings-toggle" id="settingsToggle">configure API endpoint</button>
+      <div class="settings-panel" id="settingsPanel">
+        <input type="text" id="apiUrlInput" placeholder="https://your-api.onrender.com">
+        <button id="saveApiUrl">Save</button>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  const DEFAULT_API_URL = "https://fraud-detection-mlops-7lsh.onrender.com";
+  let API_URL = localStorage.getItem("fraudwatch_api_url") || DEFAULT_API_URL;
+
+  const statusDot = document.getElementById("statusDot");
+  const statusText = document.getElementById("statusText");
+  const btnGenerate = document.getElementById("btnGenerate");
+  const btnRun = document.getElementById("btnRun");
+  const btnNormal = document.getElementById("btnNormal");
+  const btnSuspicious = document.getElementById("btnSuspicious");
+  const needle = document.getElementById("needle");
+  const gaugeValue = document.getElementById("gaugeValue");
+  const verdictText = document.getElementById("verdictText");
+  const metaNote = document.getElementById("metaNote");
+  const latency = document.getElementById("latency");
+  const settingsToggle = document.getElementById("settingsToggle");
+  const settingsPanel = document.getElementById("settingsPanel");
+  const apiUrlInput = document.getElementById("apiUrlInput");
+  const saveApiUrl = document.getElementById("saveApiUrl");
+
+  let currentProfile = "normal";
+  let currentTransaction = null;
+
+  apiUrlInput.value = API_URL;
+
+  settingsToggle.addEventListener("click", () => settingsPanel.classList.toggle("open"));
+  saveApiUrl.addEventListener("click", () => {
+    const val = apiUrlInput.value.trim().replace(/\/$/, "");
+    if (val) {
+      API_URL = val;
+      localStorage.setItem("fraudwatch_api_url", val);
+      checkHealth();
+    }
+  });
+
+  // --- Simulated transaction generation ---
+  // V1-V28 are PCA-transformed features in the real dataset; we don't have
+  // access to the original PCA transform, so this generates plausible-looking
+  // demo values only — NOT real fraud signatures. "Anomalous pattern" simply
+  // uses wider variance and a shifted mean to visually differ from "typical."
+  function gaussianRandom(mean, stdev) {
+    const u = 1 - Math.random();
+    const v = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    return z * stdev + mean;
+  }
+
+  function generateTransaction(profile) {
+    const features = {};
+    for (let i = 1; i <= 28; i++) {
+      features["V" + i] = profile === "suspicious"
+        ? gaussianRandom(1.8, 2.4)
+        : gaussianRandom(0, 1);
+    }
+    const amount = profile === "suspicious"
+      ? Math.round(gaussianRandom(480, 260) * 100) / 100
+      : Math.round(gaussianRandom(70, 55) * 100) / 100;
+    const time = Math.floor(Math.random() * 172792);
+
+    return {
+      Time: time,
+      Amount: Math.max(0.5, amount),
+      ...features,
+    };
+  }
+
+  function formatTime(seconds) {
+    const h = String(Math.floor(seconds / 3600) % 24).padStart(2, "0");
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const s = String(Math.floor(seconds % 60)).padStart(2, "0");
+    return `${h}:${m}:${s}`;
+  }
+
+  function renderTicket(tx) {
+    document.getElementById("ticketId").textContent = "#" + Math.floor(10000 + Math.random() * 89999);
+    document.getElementById("valAmount").textContent = "$" + tx.Amount.toFixed(2);
+    document.getElementById("valTime").textContent = formatTime(tx.Time);
+    document.getElementById("valProfile").textContent = "V1–V28 (PCA · " + currentProfile + ")";
+    btnRun.disabled = false;
+
+    // reset gauge/verdict on new ticket
+    needle.style.transform = "rotate(-90deg)";
+    gaugeValue.textContent = "—";
+    gaugeValue.style.color = "var(--muted)";
+    verdictText.textContent = "Ready to run";
+    verdictText.className = "verdict-text idle";
+    latency.textContent = "—";
+  }
+
+  btnGenerate.addEventListener("click", () => {
+    currentTransaction = generateTransaction(currentProfile);
+    renderTicket(currentTransaction);
+  });
+
+  [btnNormal, btnSuspicious].forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentProfile = btn.dataset.profile;
+      [btnNormal, btnSuspicious].forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentTransaction = generateTransaction(currentProfile);
+      renderTicket(currentTransaction);
+    });
+  });
+
+  btnRun.addEventListener("click", async () => {
+    if (!currentTransaction) return;
+    btnRun.disabled = true;
+    btnRun.textContent = "Running…";
+    verdictText.textContent = "Scoring…";
+    verdictText.className = "verdict-text idle";
+
+    const start = performance.now();
+    try {
+      const res = await fetch(API_URL + "/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(currentTransaction),
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      const elapsed = Math.round(performance.now() - start);
+      latency.textContent = elapsed + "ms";
+
+      const prob = data.fraud_probability;
+      const angle = -90 + prob * 180;
+      needle.style.transform = `rotate(${angle}deg)`;
+      gaugeValue.textContent = (prob * 100).toFixed(1) + "%";
+      gaugeValue.style.color = data.is_fraud ? "var(--risk)" : "var(--safe)";
+
+      verdictText.textContent = data.is_fraud ? "Flagged as fraud" : "Looks legitimate";
+      verdictText.className = "verdict-text " + (data.is_fraud ? "risk" : "safe");
+      metaNote.textContent = `Model v${data.model_version} · threshold ${data.threshold_used}`;
+    } catch (err) {
+      verdictText.textContent = "Request failed — check API endpoint";
+      verdictText.className = "verdict-text risk";
+      gaugeValue.textContent = "err";
+    } finally {
+      btnRun.disabled = false;
+      btnRun.textContent = "Run through model";
+    }
+  });
+
+  async function checkHealth() {
+    try {
+      const res = await fetch(API_URL + "/health");
+      const data = await res.json();
+      const versionNote = document.getElementById("modelVersionNote");
+      if (data.model_loaded) {
+        statusDot.className = "dot online";
+        statusText.textContent = "model online";
+        if (versionNote) versionNote.textContent = "model v" + data.model_version + " · live";
+      } else {
+        statusDot.className = "dot offline";
+        statusText.textContent = "model not loaded";
+        if (versionNote) versionNote.textContent = "model not loaded";
+      }
+    } catch (err) {
+      statusDot.className = "dot offline";
+      statusText.textContent = "api unreachable";
+      const versionNote = document.getElementById("modelVersionNote");
+      if (versionNote) versionNote.textContent = "api unreachable";
+    }
+  }
+
+  // Init
+  currentTransaction = generateTransaction(currentProfile);
+  renderTicket(currentTransaction);
+  checkHealth();
+  showPage(location.hash ? location.hash.replace("#", "") : "terminal");
+
+  // --- Page navigation (Terminal / Dashboard) ---
+  const navTabs = document.querySelectorAll(".nav-tab");
+  const pages = document.querySelectorAll(".page");
+
+  function showPage(name) {
+    pages.forEach(p => p.classList.toggle("active", p.id === "page-" + name));
+    navTabs.forEach(t => t.classList.toggle("active", t.dataset.page === name));
+    if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
+  }
+
+  navTabs.forEach(tab => {
+    tab.addEventListener("click", () => showPage(tab.dataset.page));
+  });
+
+  window.addEventListener("hashchange", () => {
+    const name = location.hash.replace("#", "") || "terminal";
+    showPage(name);
+  });
+
+  // --- Savings-by-threshold chart (from validated cross-validation run) ---
+  const savingsData = [
+    { threshold: "0.3", savings: 5972.01, best: true },
+    { threshold: "0.4", savings: 5379.51, best: false },
+    { threshold: "0.5", savings: 5025.93, best: false },
+    { threshold: "0.6", savings: 3848.03, best: false },
+    { threshold: "0.7", savings: 2570.73, best: false },
+  ];
+
+  function renderSavingsChart() {
+    const row = document.getElementById("chartRow");
+    const labels = document.getElementById("chartLabels");
+    const maxVal = Math.max(...savingsData.map(d => d.savings));
+
+    savingsData.forEach(d => {
+      const pct = (d.savings / maxVal) * 100;
+
+      const wrap = document.createElement("div");
+      wrap.className = "chart-bar-wrap";
+      const bar = document.createElement("div");
+      bar.className = "chart-bar" + (d.best ? " best" : "");
+      bar.style.height = "0%";
+      const val = document.createElement("div");
+      val.className = "chart-bar-value";
+      val.textContent = "$" + Math.round(d.savings).toLocaleString();
+      bar.appendChild(val);
+      wrap.appendChild(bar);
+      row.appendChild(wrap);
+
+      const label = document.createElement("div");
+      label.className = "chart-label";
+      label.textContent = d.threshold;
+      labels.appendChild(label);
+
+      requestAnimationFrame(() => { bar.style.height = pct + "%"; });
+    });
+  }
+  renderSavingsChart();
+
+
+</script>
+
+</body>
+</html>

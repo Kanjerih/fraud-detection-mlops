@@ -11,7 +11,6 @@ Run with:  python -m src.data.fetch_data
 import shutil
 import subprocess
 import zipfile
-from pathlib import Path
 
 from src.config import settings
 
@@ -27,9 +26,13 @@ def fetch_data() -> None:
     print(f"Downloading {KAGGLE_DATASET} via Kaggle CLI...")
     subprocess.run(
         [
-            "kaggle", "datasets", "download",
-            "-d", KAGGLE_DATASET,
-            "-p", str(raw_dir),
+            "kaggle",
+            "datasets",
+            "download",
+            "-d",
+            KAGGLE_DATASET,
+            "-p",
+            str(raw_dir),
         ],
         check=True,
     )
