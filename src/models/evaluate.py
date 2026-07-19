@@ -11,7 +11,6 @@ Run with:  python -m src.models.evaluate
 
 import json
 
-import joblib
 import numpy as np
 from sklearn.metrics import precision_score, recall_score
 from sklearn.model_selection import StratifiedKFold
