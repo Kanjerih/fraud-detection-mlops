@@ -14,7 +14,6 @@ Run with:  python -m src.monitoring.drift_check
 from evidently.metric_preset import DataDriftPreset
 from evidently.report import Report
 
-
 from src.config import settings
 from src.data.load_data import load_raw_data
 
