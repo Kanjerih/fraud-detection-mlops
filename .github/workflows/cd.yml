@@ -11,6 +11,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     needs: []
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +37,10 @@ jobs:
         run: python -m src.data.fetch_data
 
       - name: Re-run training quality gate before deploy
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: python -m src.models.train
 
       - name: Set up Docker Buildx
