@@ -43,7 +43,7 @@ def cross_validate(X, y, n_splits, random_state) -> dict:
         y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 
         model = RandomForestClassifier(
-            n_estimators=settings.n_estimators, random_state=random_state
+            n_estimators=settings.n_estimators, random_state=random_state, n_jobs=-1
         )
         model.fit(X_train, y_train)
         preds = model.predict(X_val)
@@ -84,7 +84,7 @@ def train() -> dict:
         )
 
         model = RandomForestClassifier(
-            n_estimators=settings.n_estimators, random_state=settings.random_state
+            n_estimators=settings.n_estimators, random_state=settings.random_state, n_jobs=-1
         )
         model.fit(xtrain, ytrain)
 
